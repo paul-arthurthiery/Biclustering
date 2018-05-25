@@ -33,15 +33,9 @@ public class FileProcessor
                     Integer.parseInt(raw[20]),Integer.parseInt(raw[21]),Integer.parseInt(raw[22]),
                     Integer.parseInt(raw[23]),Integer.parseInt(raw[24]),Integer.parseInt(raw[25]),
                     Integer.parseInt(raw[26]),Integer.parseInt(raw[27]),raw[28],raw[29]);
-            // Security check
-            if(counter<flags.length)
-            {
-                flags[counter] = temp_flag;
-                counter++;
-            }
-            else {
-                break;
-            }
+
+            flags[counter] = temp_flag;
+            counter++;
         }
         return flags;
     }
