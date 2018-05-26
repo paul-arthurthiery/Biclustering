@@ -13,16 +13,6 @@ public class Testing
         clusterer.biCluster(result);
 
 
-        for (int i=0; i<result.size(); i++) {
-            //System.out.print(result.get(i).size()+" / ");
-            System.out.print("[");
-            for(int j=0; j<result.get(i).size(); j++){
-                System.out.print(result.get(i).get(j).landmass + ", ");
-            }
-            System.out.println("]");
-        }
-
-
     }
 
 }

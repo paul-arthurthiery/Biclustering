@@ -19,6 +19,7 @@ public class ClusterTool {
         }
     }
 
+    //generate a first list of clusters by grouping all flags from similar continents
     public List<List<Flag>> getLandmassClusters() {
         for(int i=0; i<this.listOfFlags.length; i++){
             this.listOfClusters.get(this.listOfFlags[i].landmass-1).add(this.listOfFlags[i]);
@@ -34,17 +35,18 @@ public class ClusterTool {
         long millisStart = Calendar.getInstance().getTimeInMillis();
         // loops through all the clusters and all the flags intra-cluster to compare flags one by one,
         // and store an array with the distances between each
-        List<List<List<Integer>>> distances = new ArrayList<List<List<Integer>>>();
+        List<int[][]> distances = new ArrayList<int[][]>();
         for(List<Flag> cluster : singleClusteredList)
         {
-            List<List<Integer>> clusterMatrix = new ArrayList<List<Integer>>();
+            int[][] clusterMatrix = new int[cluster.size()][cluster.size()];
             for(int i=0; i<cluster.size();i++)
             {
                 Flag flagOne = cluster.get(i);
+                clusterMatrix[i][i] = 0;
                 for(int j=i+1; j<cluster.size();j++)
                 {
                     Flag flagTwo = cluster.get(j);
-                    clusterMatrix.add(compareTwoFlags(flagOne, flagTwo));
+                    clusterMatrix[i][j] = clusterMatrix[j][i] = compareTwoFlags(flagOne, flagTwo);
                 }
             }
             distances.add(clusterMatrix);
@@ -71,40 +73,40 @@ public class ClusterTool {
     }
 
     // method to compare attributes of two flags, returns the difference in an array
-    private List<Integer> compareTwoFlags(Flag flagOne, Flag flagTwo)
+    private int compareTwoFlags(Flag flagOne, Flag flagTwo)
     {
-        List<Integer> distances = new ArrayList<Integer>();
-        distances.add(abs(stringCompare(flagOne.name,flagTwo.name)));
-        distances.add(abs(flagOne.landmass-flagTwo.landmass));
-        distances.add(abs(flagOne.zone-flagTwo.zone));
-        distances.add(abs(flagOne.area-flagTwo.area));
-        distances.add(abs(flagOne.population-flagTwo.population));
-        distances.add(abs(flagOne.language-flagTwo.language));
-        distances.add(abs(flagOne.religion-flagTwo.religion));
-        distances.add(abs(flagOne.bars-flagTwo.bars));
-        distances.add(abs(flagOne.stripes-flagTwo.stripes));
-        distances.add(abs(flagOne.colours-flagTwo.colours));
-        distances.add(abs(flagOne.red-flagTwo.red));
-        distances.add(abs(flagOne.green-flagTwo.green));
-        distances.add(abs(flagOne.blue-flagTwo.blue));
-        distances.add(abs(flagOne.gold-flagTwo.gold));
-        distances.add(abs(flagOne.white-flagTwo.white));
-        distances.add(abs(flagOne.black-flagTwo.black));
-        distances.add(abs(flagOne.orange-flagTwo.orange));
-        distances.add(abs(stringCompare(flagOne.mainhue,flagTwo.mainhue)));
-        distances.add(abs(flagOne.circles-flagTwo.circles));
-        distances.add(abs(flagOne.crosses-flagTwo.crosses));
-        distances.add(abs(flagOne.saltires-flagTwo.saltires));
-        distances.add(abs(flagOne.quarters-flagTwo.quarters));
-        distances.add(abs(flagOne.sunstars-flagTwo.sunstars));
-        distances.add(abs(flagOne.crescent-flagTwo.crescent));
-        distances.add(abs(flagOne.triangle-flagTwo.triangle));
-        distances.add(abs(flagOne.icon-flagTwo.icon));
-        distances.add(abs(flagOne.animate-flagTwo.animate));
-        distances.add(abs(flagOne.text-flagTwo.text));
-        distances.add(abs(stringCompare(flagOne.topleft,flagTwo.topleft)));
-        distances.add(abs(stringCompare(flagOne.botright,flagTwo.botright)));
-        return distances;
+        int distance = 0;
+        distance += (abs(stringCompare(flagOne.name,flagTwo.name)));
+        distance += (abs(flagOne.landmass-flagTwo.landmass));
+        distance += (abs(flagOne.zone-flagTwo.zone));
+        distance += (abs(flagOne.area-flagTwo.area));
+        distance += (abs(flagOne.population-flagTwo.population));
+        distance += (abs(flagOne.language-flagTwo.language));
+        distance += (abs(flagOne.religion-flagTwo.religion));
+        distance += (abs(flagOne.bars-flagTwo.bars));
+        distance += (abs(flagOne.stripes-flagTwo.stripes));
+        distance += (abs(flagOne.colours-flagTwo.colours));
+        distance += (abs(flagOne.red-flagTwo.red));
+        distance += (abs(flagOne.green-flagTwo.green));
+        distance += (abs(flagOne.blue-flagTwo.blue));
+        distance += (abs(flagOne.gold-flagTwo.gold));
+        distance += (abs(flagOne.white-flagTwo.white));
+        distance += (abs(flagOne.black-flagTwo.black));
+        distance += (abs(flagOne.orange-flagTwo.orange));
+        distance += (abs(stringCompare(flagOne.mainhue,flagTwo.mainhue)));
+        distance += (abs(flagOne.circles-flagTwo.circles));
+        distance += (abs(flagOne.crosses-flagTwo.crosses));
+        distance += (abs(flagOne.saltires-flagTwo.saltires));
+        distance += (abs(flagOne.quarters-flagTwo.quarters));
+        distance += (abs(flagOne.sunstars-flagTwo.sunstars));
+        distance += (abs(flagOne.crescent-flagTwo.crescent));
+        distance += (abs(flagOne.triangle-flagTwo.triangle));
+        distance += (abs(flagOne.icon-flagTwo.icon));
+        distance += (abs(flagOne.animate-flagTwo.animate));
+        distance += (abs(flagOne.text-flagTwo.text));
+        distance += (abs(stringCompare(flagOne.topleft,flagTwo.topleft)));
+        distance += (abs(stringCompare(flagOne.botright,flagTwo.botright)));
+        return distance;
     }
 
 
