@@ -7,12 +7,14 @@ import java.util.List;
 import static java.lang.Math.abs;
 
 public class ClusterTool {
-    private List<List<Flag>> listOfClusters;
+    private List<List<Flag>> listOfClusters, oneCluster;
     private Flag[] listOfFlags;
 
     public ClusterTool(Flag[] listOfFlags) {
         this.listOfFlags = listOfFlags;
         this.listOfClusters = new ArrayList<List<Flag>>();
+        this.oneCluster = new ArrayList<List<Flag>>();
+        this.oneCluster.add(new ArrayList<Flag>());
         for(int i=0; i<6; i++){
             ArrayList<Flag> cluster = new ArrayList<Flag>();
             listOfClusters.add(cluster);
@@ -25,6 +27,15 @@ public class ClusterTool {
             this.listOfClusters.get(this.listOfFlags[i].landmass-1).add(this.listOfFlags[i]);
         }
         return this.listOfClusters;
+    }
+
+    // groups all the flags into one cluster
+    public List<List<Flag>> getOneCluster()
+    {
+        for(Flag flag : this.listOfFlags) {
+            this.oneCluster.get(0).add(flag);
+        }
+        return this.oneCluster;
     }
 
     public List<List<Flag>> biCluster(List<List<Flag>> singleClusteredList)
