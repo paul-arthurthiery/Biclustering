@@ -28,15 +28,12 @@ public class ClusterTool {
 
     public List<List<Flag>> biCluster(List<List<Flag>> singleClusteredList)
     {
-        //TODO : List<List<List<Integer>>> distances = new ArrayList de matrice pour chaque cluster;
-        //TODO : fill matrix with distance between each element in cluster (start by doing the absolute value of the difference between each variable of each Flag in the cluster)
-        //TODO : create ArrayList of ArrayLists of Flag
-        //for each group of flags in cluster with a distance below the threshold, create a new cluster
-        //add all these flags to the cluster
-        //return this 2d arraylist
+        //TODO DONE : List<List<List<Integer>>> distances = new ArrayList de matrice pour chaque cluster;
+        //TODO DONE : fill matrix with distance between each element in cluster (start by doing the absolute value of the difference between each variable of each Flag in the cluster)
 
         long millisStart = Calendar.getInstance().getTimeInMillis();
-
+        // loops through all the clusters and all the flags intra-cluster to compare flags one by one,
+        // and store an array with the distances between each
         List<List<List<Integer>>> distances = new ArrayList<List<List<Integer>>>();
         for(List<Flag> cluster : singleClusteredList)
         {
@@ -46,21 +43,34 @@ public class ClusterTool {
                 Flag flagOne = cluster.get(i);
                 for(int j=i+1; j<cluster.size();j++)
                 {
-                    List<Integer> twoFlagsDistance = new ArrayList<Integer>();
                     Flag flagTwo = cluster.get(j);
                     clusterMatrix.add(compareTwoFlags(flagOne, flagTwo));
                 }
             }
             distances.add(clusterMatrix);
         }
-
         long millisEnd = Calendar.getInstance().getTimeInMillis();
-
         System.out.println("Distance Done Time : "+(millisEnd-millisStart));
 
-        return null;
+        //TODO DONE : create ArrayList of ArrayLists of Flag
+        List<List<Flag>> reClusteredFlags = new ArrayList<List<Flag>>();
+
+        //TODO : for each group of flags in cluster with a distance below the threshold, create a new cluster
+        //TODO : add all these flags to the cluster
+        //TODO : return this 2nd arraylist
+        // Comment déterminer un threshold ?
+        // Nombre de clusters minimal ? 2 maybe ?
+        // Nombre de paramètres minimum pour former un cluster ?
+        // Regrouper en catégorie "nbr de critères similaires" ?
+        // Créer une note de "matching" et regrouper ensuite ?
+        
+
+
+
+        return reClusteredFlags;
     }
 
+    // method to compare attributes of two flags, returns the difference in an array
     private List<Integer> compareTwoFlags(Flag flagOne, Flag flagTwo)
     {
         List<Integer> distances = new ArrayList<Integer>();
