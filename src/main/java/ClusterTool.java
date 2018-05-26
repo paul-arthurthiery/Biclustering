@@ -8,9 +8,11 @@ import static java.lang.Math.abs;
 
 public class ClusterTool {
     private Flag[] listOfFlags;
+    private int numberOfClusters;
 
-    public ClusterTool(Flag[] listOfFlags) {
+    public ClusterTool(Flag[] listOfFlags, int numberOfClusters) {
         this.listOfFlags = listOfFlags;
+        this.numberOfClusters = numberOfClusters;
     }
 
 
@@ -23,6 +25,8 @@ public class ClusterTool {
         long millisStart = Calendar.getInstance().getTimeInMillis();
         // loops through all the clusters and all the flags intra-cluster to compare flags one by one,
         // and store an array with the distances between each
+
+        //TODO : add average distance with every other flag for each flag
         int[][] distances = new int[singleClusteredList.length][singleClusteredList.length];
         for(int i=0; i<singleClusteredList.length;i++)
         {
@@ -42,14 +46,10 @@ public class ClusterTool {
         List<List<Flag>> biClusteredFlags = new ArrayList<List<Flag>>();
 
 
-        //TODO : for each group of flags in cluster with a distance below the threshold, create a new cluster
-        //TODO : add all these flags to the cluster
-        //TODO : return this 2nd arraylist
-        // Comment déterminer un threshold ?
-        // Nombre de clusters minimal ? 2 maybe ?
-        // Nombre de paramètres minimum pour former un cluster ?
-        // Regrouper en catégorie "nbr de critères similaires" ?
-        // Créer une note de "matching" et regrouper ensuite ?
+        //TODO : remove 5-10% of flags with the lowest/highest average distance (removes the aberrant values)
+        //TODO : create n arralists in biClusteredFlags. Add to each one of the n remaining flags with the largest distance
+        //TODO : create a method which takes in parameter the array of distances and the current list of clusters
+        //for each cluster, it will add the closest flag to the first flag in the array. if two clusters have the same next closest flag, it will go to the cluster with the shortest distance (either for the first flag or the whole array if i can)
 
 
         return biClusteredFlags;
