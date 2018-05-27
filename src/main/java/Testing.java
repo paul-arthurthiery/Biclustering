@@ -1,3 +1,6 @@
+import javax.imageio.ImageIO;
+import javax.print.DocFlavor;
+import javax.swing.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +13,9 @@ public class Testing
         FileProcessor processor = new FileProcessor();
         Flag[] flags = processor.processFile("flag.txt");
         ClusterTool clusterer = new ClusterTool(flags, 6);
-        clusterer.biCluster();
+        List<List<Flag>> result = clusterer.biCluster();
+        clusterer.displayClustersFlags(result);
+
 
     }
 

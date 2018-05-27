@@ -1,5 +1,10 @@
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.List;
 
 import static java.lang.Math.abs;
 
@@ -103,6 +108,47 @@ public class ClusterTool {
         printBicluster(biClusteredFlags);
 
         return biClusteredFlags;
+    }
+
+    public void displayClustersFlags(List<List<Flag>> clusters)
+    {
+        int counter = 1;
+        for(List<Flag> cluster : clusters)
+        {
+            String title = "Cluster "+counter;
+            JPanel pane = new JPanel();
+            for(Flag flag : cluster)
+            {
+                String flagName = flag.name;
+                flagName = flagName.replaceAll("-"," ");
+                String src = "flags/Flag of "+flagName+".gif";
+                ImageIcon icon = new ImageIcon(src);
+                icon = resizeIcon(icon, 150, 118);
+                JLabel label = new JLabel(icon);
+                label.setText(flagName);
+                label.setHorizontalTextPosition(JLabel.CENTER);
+                label.setVerticalTextPosition(JLabel.BOTTOM);
+                pane.add(label);
+            }
+            showFrame(pane,title);
+            counter++;
+        }
+    }
+
+    private ImageIcon resizeIcon(ImageIcon icon, int width, int height)
+    {
+        Image img = icon.getImage();
+        Image newimg = img.getScaledInstance(width, height,  java.awt.Image.SCALE_SMOOTH);
+        return new ImageIcon(newimg);
+    }
+
+    private void showFrame(JPanel pane, String title)
+    {
+        JFrame mainframe = new JFrame(title);
+        mainframe.getContentPane().add(pane);
+        mainframe.setBounds(0, 0, 1000, 1000);
+        mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainframe.setVisible(true);
     }
 
     // method to compare attributes of two flags, returns the difference in an array
