@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public class Testing
@@ -9,9 +10,7 @@ public class Testing
         FileProcessor processor = new FileProcessor();
         Flag[] flags = processor.processFile("flag.txt");
         ClusterTool clusterer = new ClusterTool(flags, 6);
-        System.out.println("###");
         clusterer.biCluster();
-
 
     }
 

@@ -1,8 +1,5 @@
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.Math.abs;
 
@@ -18,7 +15,7 @@ public class ClusterTool {
 
     public List<List<Flag>> biCluster()
     {
-        Flag[] singleClusteredList = this.listOfFlags;
+        Flag[] singleClusteredList = this.listOfFlags.clone();
         //TODO DONE : List<List<List<Integer>>> distances = new ArrayList de matrice pour chaque cluster;
         //TODO DONE : fill matrix with distance between each element in cluster (start by doing the absolute value of the difference between each variable of each Flag in the cluster)
 
@@ -26,8 +23,12 @@ public class ClusterTool {
         // loops through all the clusters and all the flags intra-cluster to compare flags one by one,
         // and store an array with the distances between each
 
+        int numberOfFlags = this.listOfFlags.length;
+        int[] oneDimensionArray = new int[(numberOfFlags*(numberOfFlags-1))/2];
+        int[][] flagPairs = new int[oneDimensionArray.length][2];
         //TODO : add average distance with every other flag for each flag
         int[][] distances = new int[singleClusteredList.length][singleClusteredList.length];
+        int counter = 0;
         for(int i=0; i<singleClusteredList.length;i++)
         {
             Flag flagOne = singleClusteredList[i];
@@ -35,7 +36,10 @@ public class ClusterTool {
             for(int j=i+1; j<singleClusteredList.length;j++)
             {
                 Flag flagTwo = singleClusteredList[j];
-                distances[i][j] = distances[j][i] = compareTwoFlags(flagOne, flagTwo);
+                distances[i][j] = distances[j][i] = oneDimensionArray[counter] = compareTwoFlags(flagOne, flagTwo);
+                flagPairs[counter][0] = i;
+                flagPairs[counter][1] = j;
+                counter++;
             }
         }
 
@@ -45,11 +49,29 @@ public class ClusterTool {
         //TODO DONE : create ArrayList of ArrayLists of Flag
         List<List<Flag>> biClusteredFlags = new ArrayList<List<Flag>>();
 
-
         //TODO : remove 5-10% of flags with the lowest/highest average distance (removes the aberrant values)
         //TODO : create n arralists in biClusteredFlags. Add to each one of the n remaining flags with the largest distance
         //TODO : create a method which takes in parameter the array of distances and the current list of clusters
         //for each cluster, it will add the closest flag to the first flag in the array. if two clusters have the same next closest flag, it will go to the cluster with the shortest distance (either for the first flag or the whole array if i can)
+
+        ArrayIndexComparator comparator = new ArrayIndexComparator(oneDimensionArray);
+        Integer[] indexes = comparator.createIndexArray();
+        Arrays.sort(indexes, comparator);
+
+        int position = (indexes.length/2)-1; // position of medianIndex in indexes array
+        int medianIndex = indexes[position]; // value of the index of the median
+        int medianDistance = oneDimensionArray[medianIndex];
+        // percentage to keep, centered on the median (half above and under)
+        float percentageToKeep = 50;
+        int bottomIndex = (int)((position)-((percentageToKeep/200.0)*indexes.length));
+        int topIndex = (int)((position)+((percentageToKeep/200.0)*indexes.length));
+        int[] flagsToKeep = Arrays.copyOfRange(oneDimensionArray, bottomIndex,topIndex+1);
+        
+        //#### INFO : to know what pair of flags is at an index, just do :
+        //########### --> flagPairs[index]  // returns int[flagOne,flagTwo]
+
+        //TODO : next find the n best distances to create the clusters
+
 
 
         return biClusteredFlags;
@@ -109,6 +131,31 @@ public class ClusterTool {
         if(a == b) return 0;
         int max = a>b ? a : b;
         return (abs(a-b)/max)*100;
+    }
+
+    public class ArrayIndexComparator implements Comparator<Integer>
+    {
+        private final int[] array;
+
+        public ArrayIndexComparator(int[] array)
+        {
+            this.array = array;
+        }
+
+        public Integer[] createIndexArray()
+        {
+            Integer[] indexes = new Integer[array.length];
+            for (int i = 0; i < array.length; i++)
+            {
+                indexes[i] = i;
+            }
+            return indexes;
+        }
+
+        public int compare(Integer index1, Integer index2)
+        {
+            return array[index1] <= array[index2] ? (array[index1] < array[index2] ? -1 : 0) : 1;
+        }
     }
 
 
