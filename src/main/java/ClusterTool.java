@@ -24,10 +24,11 @@ public class ClusterTool {
         // and store an array with the distances between each
 
         int numberOfFlags = this.listOfFlags.length;
-        int[] oneDimensionArray = new int[(numberOfFlags*(numberOfFlags-1))/2];
-        int[][] flagPairs = new int[oneDimensionArray.length][2];
-        //TODO : add average distance with every other flag for each flag
+        int[] arrayAllPairDistances = new int[(numberOfFlags*(numberOfFlags-1))/2];
+        int[][] flagPairs = new int[arrayAllPairDistances.length][2];
+        //TODO DONE: add average distance with every other flag for each flag
         int[][] distances = new int[singleClusteredList.length][singleClusteredList.length];
+        int[] averageDistancePerFlag = new int[listOfFlags.length];
         int counter = 0;
         for(int i=0; i<singleClusteredList.length;i++)
         {
@@ -36,50 +37,76 @@ public class ClusterTool {
             for(int j=i+1; j<singleClusteredList.length;j++)
             {
                 Flag flagTwo = singleClusteredList[j];
-                distances[i][j] = distances[j][i] = oneDimensionArray[counter] = compareTwoFlags(flagOne, flagTwo);
+                distances[i][j] = distances[j][i] = arrayAllPairDistances[counter] = compareTwoFlags(flagOne, flagTwo);
+                averageDistancePerFlag[i] += distances[i][j];
+                averageDistancePerFlag[j] += distances[i][j];
                 flagPairs[counter][0] = i;
                 flagPairs[counter][1] = j;
                 counter++;
             }
+            averageDistancePerFlag[i] /= listOfFlags.length;
         }
 
         long millisEnd = Calendar.getInstance().getTimeInMillis();
         System.out.println("Distance Done Time : "+(millisEnd-millisStart));
 
-        //TODO DONE : create ArrayList of ArrayLists of Flag
-        List<List<Flag>> biClusteredFlags = new ArrayList<List<Flag>>();
+        //TODO DONE: remove 20% of flags with the lowest/highest average distance compared to median value (removes the aberrant values)
+        millisStart = Calendar.getInstance().getTimeInMillis();
 
-        //TODO : remove 5-10% of flags with the lowest/highest average distance (removes the aberrant values)
-        //TODO : create n arralists in biClusteredFlags. Add to each one of the n remaining flags with the largest distance
-        //TODO : create a method which takes in parameter the array of distances and the current list of clusters
-        //for each cluster, it will add the closest flag to the first flag in the array. if two clusters have the same next closest flag, it will go to the cluster with the shortest distance (either for the first flag or the whole array if i can)
-
-        ArrayIndexComparator comparator = new ArrayIndexComparator(oneDimensionArray);
+        ArrayIndexComparator comparator = new ArrayIndexComparator(arrayAllPairDistances);
         Integer[] indexes = comparator.createIndexArray();
         Arrays.sort(indexes, comparator);
 
         int position = (indexes.length/2)-1; // position of medianIndex in indexes array
         int medianIndex = indexes[position]; // value of the index of the median
-        int medianDistance = oneDimensionArray[medianIndex];
+        int medianDistance = arrayAllPairDistances[medianIndex];
         // percentage to keep, centered on the median (half above and under)
-        float percentageToKeep = 50;
+        float percentageToKeep = 80;
         int bottomIndex = (int)((position)-((percentageToKeep/200.0)*indexes.length));
         int topIndex = (int)((position)+((percentageToKeep/200.0)*indexes.length));
-        int[] flagsToKeep = Arrays.copyOfRange(oneDimensionArray, bottomIndex,topIndex+1);
-        
+        Integer[] indexesOfFlagsToKeep = Arrays.copyOfRange(indexes, bottomIndex,topIndex+1);
+
+        millisEnd = Calendar.getInstance().getTimeInMillis();
+        System.out.println("Sorting and Median Done Time : " +(millisEnd-millisStart));
+
+        millisStart = Calendar.getInstance().getTimeInMillis();
+
         //#### INFO : to know what pair of flags is at an index, just do :
         //########### --> flagPairs[index]  // returns int[flagOne,flagTwo]
+        //TODO DONE : create ArrayList of ArrayLists of Flag
+        List<List<Flag>> biClusteredFlags = new ArrayList<List<Flag>>();
+        //TODO DONE: next find the n best distances to create the clusters
+        //TODO DONE: create n ArrayLists in biClusteredFlags. Add to each one of the n remaining flags with the largest pair distance but the smallest average distance
+        Stack remainingFlagsStack = new Stack<Flag>();
+        remainingFlagsStack.addAll(Arrays.asList(listOfFlags));
+        for(int k=indexesOfFlagsToKeep.length-1; k>indexesOfFlagsToKeep.length-(1+numberOfClusters); k--){
+            ArrayList<Flag> cluster = new ArrayList<Flag>();
+            int[] largeDistancePair = flagPairs[indexesOfFlagsToKeep[k]];
+            Flag flagToAdd = averageDistancePerFlag[largeDistancePair[0]] <= averageDistancePerFlag[largeDistancePair[1]] ? listOfFlags[largeDistancePair[0]] : listOfFlags[largeDistancePair[1]];
+            cluster.add(flagToAdd);
+            remainingFlagsStack.remove(flagToAdd);
+            biClusteredFlags.add(cluster);
+        }
 
-        //TODO : next find the n best distances to create the clusters
+        millisEnd = Calendar.getInstance().getTimeInMillis();
+        System.out.println("First Element Clusters Done Time : " +(millisEnd-millisStart));
 
 
+        //TODO DONE : create a method which takes in parameter the array of distances, the current list of clusters, and a stack of remaining Flags
+        //for each cluster, it will add the closest flag to the first flag in the array
+
+        millisStart = Calendar.getInstance().getTimeInMillis();
+        biClusteredFlags = biClusterFromFirstElements(biClusteredFlags, distances, remainingFlagsStack);
+        millisEnd = Calendar.getInstance().getTimeInMillis();
+        System.out.println("Final Biclustering done time : " +(millisEnd-millisStart));
+
+        printBicluster(biClusteredFlags);
 
         return biClusteredFlags;
     }
 
     // method to compare attributes of two flags, returns the difference in an array
-    private int compareTwoFlags(Flag flagOne, Flag flagTwo)
-    {
+    private int compareTwoFlags(Flag flagOne, Flag flagTwo) {
         int distance = 0;
         distance += stringCompare(flagOne.name,flagTwo.name);
         distance += nonSubtractionCompare(flagOne.landmass,flagTwo.landmass);
@@ -133,8 +160,7 @@ public class ClusterTool {
         return (abs(a-b)/max)*100;
     }
 
-    public class ArrayIndexComparator implements Comparator<Integer>
-    {
+    public class ArrayIndexComparator implements Comparator<Integer> {
         private final int[] array;
 
         public ArrayIndexComparator(int[] array)
@@ -155,6 +181,31 @@ public class ClusterTool {
         public int compare(Integer index1, Integer index2)
         {
             return array[index1] <= array[index2] ? (array[index1] < array[index2] ? -1 : 0) : 1;
+        }
+    }
+
+    public List<List<Flag>> biClusterFromFirstElements(List<List<Flag>> biclusters, int[][] distances, Stack<Flag> remainingFlagsStack){
+        List<Flag> arrayListOfFlags = Arrays.asList(listOfFlags);
+        while(!remainingFlagsStack.empty()){
+            Flag currentFlag = remainingFlagsStack.pop();
+            int clusterToAddFlagIndex = numberOfClusters-1;
+            int currentFlagIndex = arrayListOfFlags.indexOf(currentFlag);
+            int currentDistance = distances[arrayListOfFlags.indexOf(biclusters.get(numberOfClusters-1).get(0))][currentFlagIndex];
+            for(int j=numberOfClusters-1; j>-1; j--){
+                int newDistance = distances[arrayListOfFlags.indexOf(biclusters.get(j).get(0))][currentFlagIndex];
+                if(currentDistance > newDistance) {
+                    currentDistance = newDistance;
+                    clusterToAddFlagIndex = j;
+                }
+            }
+            biclusters.get(clusterToAddFlagIndex).add(currentFlag);
+        }
+        return biclusters;
+    }
+
+    public void printBicluster(List<List<Flag>> biClusteredFlags){
+        for(int i=0; i<biClusteredFlags.size();i++){
+            System.out.println(biClusteredFlags.get(i));
         }
     }
 

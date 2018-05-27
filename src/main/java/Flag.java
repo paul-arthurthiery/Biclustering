@@ -65,5 +65,9 @@ public class Flag {
         this.botright = botright;
     }
 
+    public String toString(){
+        return this.name;
+    }
+
 
 }
