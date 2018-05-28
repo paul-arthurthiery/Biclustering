@@ -12,10 +12,9 @@ public class Testing
 
         FileProcessor processor = new FileProcessor();
         Flag[] flags = processor.processFile("flag.txt");
-        ClusterTool clusterer = new ClusterTool(flags, 6);
+        ClusterTool clusterer = new ClusterTool(flags, 15);
         List<List<Flag>> result = clusterer.biCluster();
         clusterer.displayClustersFlags(result);
-
 
     }
 
