@@ -80,7 +80,7 @@ public class ClusterTool
         Stack remainingFlagsStack = new Stack<Flag>();
         remainingFlagsStack.addAll(Arrays.asList(listOfFlags));
 
-        /*
+        /*//########################### OLD ALGO #############################################
         for(int k=indexesOfFlagsToKeep.length-1; k>indexesOfFlagsToKeep.length-(1+numberOfClusters); k--){
             ArrayList<Flag> cluster = new ArrayList<Flag>();
             int[] largeDistancePair = flagPairs[indexesOfFlagsToKeep[k]];
@@ -92,11 +92,11 @@ public class ClusterTool
 
         millisEnd = Calendar.getInstance().getTimeInMillis();
         System.out.println("First Element Clusters Done Time : " +(millisEnd-millisStart));
-        */
+        //###################################################################################*/
 
         //########################### NEW ALGO #############################################
         millisStart = Calendar.getInstance().getTimeInMillis();
-        Object[] firstClusteringResult = findFirstClustersFlags(remainingFlagsStack,indexesOfFlagsToKeep,flagPairs,arrayAllPairDistances);
+        Object[] firstClusteringResult = findFirstClustersFlags(remainingFlagsStack,indexesOfFlagsToKeep,flagPairs,distances);
         biClusteredFlags = (List<List<Flag>>) firstClusteringResult[0];
         remainingFlagsStack = (Stack) firstClusteringResult[1];
         millisEnd = Calendar.getInstance().getTimeInMillis();
@@ -265,21 +265,21 @@ public class ClusterTool
         System.out.println("Number of Countries : "+num);
     }
     // method to call to generate the clusters with a first flag inside
-    private Object[] findFirstClustersFlags(Stack remainingFlagsStack, Integer[] indexesOfFlagsToKeep, int[][] flagPairs, int[] arrayAllPairDistances)
+    private Object[] findFirstClustersFlags(Stack remainingFlagsStack, Integer[] indexesOfFlagsToKeep, int[][] flagPairs, int[][] distances)
     {
-        Object[] toReturn = new Object[2];;
+        Object[] toReturn = new Object[2];
         if(this.numberOfClusters==2)
         {
             toReturn = findFirstClustersForTwo(indexesOfFlagsToKeep, flagPairs, remainingFlagsStack, toReturn);
         }
         else
         {
-            toReturn = findFirstClustersForMore(remainingFlagsStack, flagPairs, indexesOfFlagsToKeep, arrayAllPairDistances, toReturn);
+            toReturn = findFirstClustersForMore(remainingFlagsStack, flagPairs, indexesOfFlagsToKeep, distances, toReturn);
         }
         return toReturn;
     }
     // called from upper method to do what said above, called if the number of clusters requested is > 2
-    private Object[] findFirstClustersForMore(Stack remainingFlagsStack, int[][] flagPairs, Integer[] indexesOfFlagsToKeep, int[] arrayAllPairDistances, Object[] toReturn)
+    private Object[] findFirstClustersForMore(Stack remainingFlagsStack, int[][] flagPairs, Integer[] indexesOfFlagsToKeep, int[][] distances, Object[] toReturn)
     {
         int[][] matrixOfFlagsToKeep = new int[this.listOfFlags.length][this.listOfFlags.length];
         for(int index : indexesOfFlagsToKeep)
@@ -323,20 +323,15 @@ public class ClusterTool
                                 thepairs.clear();
                                 break;
                             }
-                            if (!verticalFlags.contains(verticalIndex))
-                            {
+                            if (!verticalFlags.contains(verticalIndex)) {
                                 verticalFlags.add(verticalIndex);
                             }
-                            if(!horizontalFlags.contains(horizontalIndex))
-                            {
+                            if(!horizontalFlags.contains(horizontalIndex)) {
                                 horizontalFlags.add(horizontalIndex);
                             }
                             thepairs.add(new int[]{horizontalIndex, verticalIndex});
                         }
-                        if (breakToken == 1)
-                        {
-                            break;
-                        }
+                        if (breakToken == 1) { break; }
                     }
                 }
                 if((verticalFlags.size()+horizontalFlags.size())==this.numberOfClusters)
@@ -362,10 +357,7 @@ public class ClusterTool
                                 int valueTwo = horizontalFlags.get(b);
                                 count += matrixOfFlagsToKeep[valueOne][valueTwo];
                             }
-                            if(count==0)
-                            {
-                                cancelToken = 1;
-                            }
+                            if(count==0) { cancelToken = 1; }
                         }
                     }
                     if(cancelToken==0)
@@ -373,20 +365,6 @@ public class ClusterTool
                         horizontalFlags.addAll(verticalFlags);
                         ArrayList<Integer> flags = new ArrayList<Integer>(horizontalFlags);
                         possibilities.add(flags);
-                        //####################################
-                        /*
-                        for(int flagNum : flags)
-                        {
-                            Flag flag = this.listOfFlags[flagNum];
-                            ArrayList<Flag> cluster = new ArrayList<Flag>();
-                            cluster.add(flag);
-                            remainingFlagsStack.remove(flag);
-                            biClusteredFlags.add(cluster);
-                        }
-                        pairs = (ArrayList<int[]>) thepairs.clone();
-                        vertical = matrixOfFlagsToKeep.length;
-                        */
-                        //################################
                         break;
 
                     }
@@ -394,26 +372,19 @@ public class ClusterTool
             }
             vertical++;
         }
-        //############################################
-        /*
-        for(int[] a : pairs)
-        {
-            System.out.print(Arrays.toString(a));
-        }
-        System.out.println();
-        */
-        //#############################################
-
-        //#############################################
-        ///*
         int[] clustersDistances = new int[possibilities.size()];
         for(int i=0; i<possibilities.size();i++)
         {
             ArrayList<Integer> cluster = possibilities.get(i);
             int distance = 0;
-            for(int flag : cluster)
+            for(int firstIndex=0; firstIndex<cluster.size()-1; firstIndex++)
             {
-                distance += arrayAllPairDistances[flag];
+                int firstFlagNumber = cluster.get(firstIndex);
+                for(int secondIndex=firstIndex+1;secondIndex<cluster.size();secondIndex++)
+                {
+                    int secondFlagNumber = cluster.get(secondIndex);
+                    distance += distances[firstFlagNumber][secondFlagNumber];
+                }
             }
             clustersDistances[i] = distance;
         }
@@ -424,17 +395,12 @@ public class ClusterTool
         System.out.println("Found Possibilities : "+possibilities.size()+" , Selected One : "+bestCluster);
         for(int flagNum : possibilities.get(bestCluster))
         {
-            System.out.print(flagNum+" / ");
             Flag flag = this.listOfFlags[flagNum];
             ArrayList<Flag> cluster = new ArrayList<Flag>();
             cluster.add(flag);
             remainingFlagsStack.remove(flag);
             biClusteredFlags.add(cluster);
         }
-        System.out.println();
-        //*/
-        //####################################
-
         toReturn[0] = biClusteredFlags;
         toReturn[1] = remainingFlagsStack;
         return toReturn;
