@@ -61,7 +61,7 @@ public class ClusterTool
 
         int position = (indexes.length/2)-1; // position of medianIndex in indexes array
         int medianIndex = indexes[position]; // value of the index of the median
-        float percentageToKeep = 80; // percentage to keep, centered on the median (half above and under)
+        float percentageToKeep = 60; // percentage to keep, centered on the median (half above and under)
         //Percentage : Max clusters / 40%:8 / 50%:10 / 60%:20 / 70%:22 / 80%:32
         // 60% and 15 clusters is nice, more tests to do
         int bottomIndex = (int)((position)-((percentageToKeep/200.0)*indexes.length));
@@ -157,7 +157,8 @@ public class ClusterTool
     }
 
     // method to compare attributes of two flags, returns the difference in an array
-    private int compareTwoFlags(Flag flagOne, Flag flagTwo) {
+    private int compareTwoFlags(Flag flagOne, Flag flagTwo)
+    {
         int distance = 0;
         distance += stringCompare(flagOne.name,flagTwo.name);
         distance += nonSubtractionCompare(flagOne.landmass,flagTwo.landmass);
@@ -256,9 +257,12 @@ public class ClusterTool
     }
     //prints the result of the biclustering
     public void printBicluster(List<List<Flag>> biClusteredFlags){
+        int num = 0;
         for(int i=0; i<biClusteredFlags.size();i++){
+            num+=biClusteredFlags.get(i).size();
             System.out.println(biClusteredFlags.get(i));
         }
+        System.out.println("Number of Countries : "+num);
     }
     // method to call to generate the clusters with a first flag inside
     private Object[] findFirstClustersFlags(Stack remainingFlagsStack, Integer[] indexesOfFlagsToKeep, int[][] flagPairs, int[] arrayAllPairDistances)
