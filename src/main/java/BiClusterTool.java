@@ -19,7 +19,7 @@ public class BiClusterTool
     }
 
     // main method to pilot all the biclustering process
-    public List<List<Flag>> biCluster()
+    public List<List<Flag>> biCluster(List<List<Flag>> clusteredFlags)
     {
         Flag[] singleClusteredList = this.listOfFlags.clone();
 
@@ -30,20 +30,32 @@ public class BiClusterTool
 
         // first step is to create all the clusters
 
-        int[][] pairsFootPrints = new int[flagPairs.length][singleClusteredList[0].getClass().getDeclaredFields().length];
-        int counter = 0;
-        for(int i=0; i<singleClusteredList.length;i++)
+
+
+        for(List<Flag> cluster : clusteredFlags)
         {
-            Flag flagOne = singleClusteredList[i];
-            for(int j=i+1; j<singleClusteredList.length;j++)
+
+            int counter = 0;
+            for(int i=0; i<cluster.size();i++)
             {
-                Flag flagTwo = singleClusteredList[j];
-                pairsFootPrints[counter] = comparePairFlags(flagOne,flagTwo);
-                flagPairs[counter][0] = i;
-                flagPairs[counter][1] = j;
-                counter++;
+                Flag flagOne = cluster.get(i);
+                for(int j=i+1; j<singleClusteredList.length;j++)
+                {
+                    Flag flagTwo = cluster.get(j);
+                    //pairsFootPrints[counter] = comparePairFlags(flagOne,flagTwo);
+                    int[] matching = comparePairFlags(flagOne,flagTwo);
+                    if(matching.length>=3)
+                    {
+                        
+
+                    }
+                    //flagPairs[counter][0] = i;
+                    //flagPairs[counter][1] = j;
+                    counter++;
+                }
             }
         }
+
 
         ArrayList<int[]> patterns = new ArrayList<int[]>();
         ArrayList<ArrayList<Flag>> clusters = new ArrayList<ArrayList<Flag>>();
@@ -85,7 +97,7 @@ public class BiClusterTool
         remainingFlagsStack.addAll(Arrays.asList(listOfFlags));
 
 
-        
+
         return biClusteredFlags;
     }
 
@@ -93,38 +105,50 @@ public class BiClusterTool
 
     private int[] comparePairFlags(Flag flagOne, Flag flagTwo)
     {
+        int numberOfMatch = 0;
         int[] footPrint = new int[flagOne.getClass().getDeclaredFields().length];
-        footPrint[0] = stringCompare(flagOne.name,flagTwo.name);
-        footPrint[1] = nonSubtractionCompare(flagOne.landmass,flagTwo.landmass);
-        footPrint[2] = nonSubtractionCompare(flagOne.zone,flagTwo.zone);
-        footPrint[3] = nonSubtractionCompare(flagOne.area, flagTwo.area);
-        footPrint[4] = nonSubtractionCompare(flagOne.population, flagTwo.population);
-        footPrint[5] = nonSubtractionCompare(flagOne.language,flagTwo.language);
-        footPrint[6] = nonSubtractionCompare(flagOne.religion,flagTwo.religion);
-        footPrint[7] = nonSubtractionCompare(flagOne.bars,flagTwo.bars);
-        footPrint[8] = nonSubtractionCompare(flagOne.stripes, flagTwo.stripes);
-        footPrint[9] = nonSubtractionCompare(flagOne.colours, flagTwo.colours);
-        footPrint[10] = nonSubtractionCompare(flagOne.red, flagTwo.red);
-        footPrint[11] = nonSubtractionCompare(flagOne.green, flagTwo.green);
-        footPrint[12] = nonSubtractionCompare(flagOne.blue, flagTwo.blue);
-        footPrint[13] = nonSubtractionCompare(flagOne.gold, flagTwo.gold);
-        footPrint[14] = nonSubtractionCompare(flagOne.white, flagTwo.white);
-        footPrint[15] = nonSubtractionCompare(flagOne.black, flagTwo.black);
-        footPrint[16] = nonSubtractionCompare(flagOne.orange, flagTwo.orange);
-        footPrint[17] = stringCompare(flagOne.mainhue,flagTwo.mainhue);
-        footPrint[18] = nonSubtractionCompare(flagOne.circles, flagTwo.circles);
-        footPrint[19] = nonSubtractionCompare(flagOne.crosses, flagTwo.crosses);
-        footPrint[20] = nonSubtractionCompare(flagOne.saltires, flagTwo.saltires);
-        footPrint[21] = nonSubtractionCompare(flagOne.quarters, flagTwo.quarters);
-        footPrint[22] = nonSubtractionCompare(flagOne.sunstars, flagTwo.sunstars);
-        footPrint[23] = nonSubtractionCompare(flagOne.crescent, flagTwo.crescent);
-        footPrint[24] = nonSubtractionCompare(flagOne.triangle, flagTwo.triangle);
-        footPrint[25] = nonSubtractionCompare(flagOne.icon, flagTwo.icon);
-        footPrint[26] = nonSubtractionCompare(flagOne.animate, flagTwo.animate);
-        footPrint[27] = nonSubtractionCompare(flagOne.text, flagTwo.text);
-        footPrint[28] = stringCompare(flagOne.topleft,flagTwo.topleft);
-        footPrint[29] = stringCompare(flagOne.botright,flagTwo.botright);
-        return footPrint;
+        numberOfMatch += footPrint[0] = stringCompare(flagOne.name,flagTwo.name);
+        numberOfMatch += footPrint[1] = nonSubtractionCompare(flagOne.landmass,flagTwo.landmass);
+        numberOfMatch += footPrint[2] = nonSubtractionCompare(flagOne.zone,flagTwo.zone);
+        numberOfMatch += footPrint[3] = nonSubtractionCompare(flagOne.area, flagTwo.area);
+        numberOfMatch += footPrint[4] = nonSubtractionCompare(flagOne.population, flagTwo.population);
+        numberOfMatch += footPrint[5] = nonSubtractionCompare(flagOne.language,flagTwo.language);
+        numberOfMatch += footPrint[6] = nonSubtractionCompare(flagOne.religion,flagTwo.religion);
+        numberOfMatch += footPrint[7] = nonSubtractionCompare(flagOne.bars,flagTwo.bars);
+        numberOfMatch += footPrint[8] = nonSubtractionCompare(flagOne.stripes, flagTwo.stripes);
+        numberOfMatch += footPrint[9] = nonSubtractionCompare(flagOne.colours, flagTwo.colours);
+        numberOfMatch += footPrint[10] = nonSubtractionCompare(flagOne.red, flagTwo.red);
+        numberOfMatch += footPrint[11] = nonSubtractionCompare(flagOne.green, flagTwo.green);
+        numberOfMatch += footPrint[12] = nonSubtractionCompare(flagOne.blue, flagTwo.blue);
+        numberOfMatch += footPrint[13] = nonSubtractionCompare(flagOne.gold, flagTwo.gold);
+        numberOfMatch += footPrint[14] = nonSubtractionCompare(flagOne.white, flagTwo.white);
+        numberOfMatch += footPrint[15] = nonSubtractionCompare(flagOne.black, flagTwo.black);
+        numberOfMatch += footPrint[16] = nonSubtractionCompare(flagOne.orange, flagTwo.orange);
+        numberOfMatch += footPrint[17] = stringCompare(flagOne.mainhue,flagTwo.mainhue);
+        numberOfMatch += footPrint[18] = nonSubtractionCompare(flagOne.circles, flagTwo.circles);
+        numberOfMatch += footPrint[19] = nonSubtractionCompare(flagOne.crosses, flagTwo.crosses);
+        numberOfMatch += footPrint[20] = nonSubtractionCompare(flagOne.saltires, flagTwo.saltires);
+        numberOfMatch += footPrint[21] = nonSubtractionCompare(flagOne.quarters, flagTwo.quarters);
+        numberOfMatch += footPrint[22] = nonSubtractionCompare(flagOne.sunstars, flagTwo.sunstars);
+        numberOfMatch += footPrint[23] = nonSubtractionCompare(flagOne.crescent, flagTwo.crescent);
+        numberOfMatch += footPrint[24] = nonSubtractionCompare(flagOne.triangle, flagTwo.triangle);
+        numberOfMatch += footPrint[25] = nonSubtractionCompare(flagOne.icon, flagTwo.icon);
+        numberOfMatch += footPrint[26] = nonSubtractionCompare(flagOne.animate, flagTwo.animate);
+        numberOfMatch += footPrint[27] = nonSubtractionCompare(flagOne.text, flagTwo.text);
+        numberOfMatch += footPrint[28] = stringCompare(flagOne.topleft,flagTwo.topleft);
+        numberOfMatch += footPrint[29] = stringCompare(flagOne.botright,flagTwo.botright);
+        int[] matches = new int[numberOfMatch];
+        int counter = 0;
+        for(int i=0; i<footPrint.length; i++)
+        {
+            if(footPrint[i]==1)
+            {
+                matches[counter] = i;
+                counter++;
+            }
+        }
+        //return footPrint;
+        return matches;
     }
 
     // method to compare two String, return 0 if identical, 1 otherwise
