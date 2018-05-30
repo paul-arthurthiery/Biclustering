@@ -26,23 +26,31 @@ public class BiClusterTool
 
         // analyze pairs in all the clusters, create and add sets where 2 flags have at least 3 criteria in common
         List<List<Flag>> sets = new ArrayList<List<Flag>>();
+        List<List<Integer>> footPrints = new ArrayList<List<Integer>>();
         for(int a=0; a<clusteredFlags.size(); a++) {
             for(int i=0; i<clusteredFlags.get(a).size();i++) {
                 Flag flagOne = clusteredFlags.get(a).get(i);
                 for (int j = i + 1; j < clusteredFlags.size(); j++) {
                     Flag flagTwo = clusteredFlags.get(a).get(j);
                     ArrayList<Integer> footPrint = comparePairFlags(flagOne, flagTwo);
-                    if(footPrint.size()>3) {
+                    if(footPrint.size() >=3 && checkIfFootPrintGenerated(footPrint, footPrints)==0) {
+                        footPrints.add(footPrint);
                         List<Flag> newSet = new ArrayList<Flag>();
                         newSet.add(flagOne);
                         newSet.add(flagTwo);
                         sets.add(newSet);
+                    } else if(footPrint.size() >= 3 && checkIfFootPrintGenerated(footPrint, footPrints)>0){
+                        sets.get(checkIfFootPrintGenerated(footPrint, footPrints)).add(flagOne);
+                        sets.get(checkIfFootPrintGenerated(footPrint, footPrints)).add(flagTwo)
                     }
                 }
             }
         }
         
         return sets;
+    }
+
+    private boolean checkIfFootPrintGenerated(ArrayList<Integer> footPrint, List<List<Integer>> footPrints) {
     }
 
 
