@@ -17,8 +17,8 @@ public class ClusterTool
         this.percentageToKeep = percentageToKeep;
     }
 
-    // main method to pilot all the biclustering process
-    public List<List<Flag>> biCluster()
+    // main method to pilot all the clustering process
+    public List<List<Flag>> cluster()
     {
         Flag[] singleClusteredList = this.listOfFlags.clone();
 
