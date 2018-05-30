@@ -25,9 +25,10 @@ public class BiClusterTool
 
         long millisStart = Calendar.getInstance().getTimeInMillis();
 
-
         int numberOfFlags = this.listOfFlags.length;
         int[][] flagPairs = new int[(numberOfFlags*(numberOfFlags-1))/2][2]; //all the possible pairs of flags
+
+        // first step is to create all the clusters
 
         int[][] pairsFootPrints = new int[flagPairs.length][singleClusteredList[0].getClass().getDeclaredFields().length];
         int counter = 0;
@@ -49,7 +50,28 @@ public class BiClusterTool
 
         for(int[] footPrint : pairsFootPrints)
         {
-
+            if(!patterns.contains(footPrint))
+            {
+                patterns.add(footPrint);
+                ArrayList<Flag> flags = new ArrayList<Flag>();
+                Flag flagOne = this.listOfFlags[flagPairs[counter][0]];
+                Flag flagTwo = this.listOfFlags[flagPairs[counter][1]];
+                flags.add(flagOne);
+                flags.add(flagTwo);
+                clusters.add(flags);
+            }
+            else
+            {
+                int patternIndex = patterns.indexOf(footPrint);
+                Flag flagOne = this.listOfFlags[flagPairs[counter][0]];
+                Flag flagTwo = this.listOfFlags[flagPairs[counter][1]];
+                if(!clusters.get(patternIndex).contains(flagOne)) {
+                    clusters.get(patternIndex).add(flagOne);
+                }
+                if(!clusters.get(patternIndex).contains(flagTwo)) {
+                    clusters.get(patternIndex).add(flagTwo);
+                }
+            }
         }
 
         long millisEnd = Calendar.getInstance().getTimeInMillis();
