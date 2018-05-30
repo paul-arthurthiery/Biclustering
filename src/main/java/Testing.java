@@ -1,18 +1,21 @@
-import javax.imageio.ImageIO;
-import javax.print.DocFlavor;
-import javax.swing.*;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 public class Testing
 {
     public static void main(String[] args) throws IOException
     {
+        // Disclaimer : as the dataset is from 1990, and the flags images more recent, the country names or the flags
+        // may have changed, hence some pairs may not correspond.
+
+        float percentageToKeep = 60; // percentage to keep, centered on the median (half above and under)
+        //Percentage : Max clusters / 40%:8 / 50%:10 / 60%:20 / 70%:22 / 80%:32
+        int numberOfClusters = 10;
 
         FileProcessor processor = new FileProcessor();
         Flag[] flags = processor.processFile("flag.txt");
-        ClusterTool clusterer = new ClusterTool(flags, 15);
+
+        ClusterTool clusterer = new ClusterTool(flags, numberOfClusters, percentageToKeep);
         List<List<Flag>> result = clusterer.biCluster();
         clusterer.displayClustersFlags(result);
 

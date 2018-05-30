@@ -1,8 +1,5 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.List;
 
@@ -12,10 +9,12 @@ public class ClusterTool
 {
     private Flag[] listOfFlags;
     private int numberOfClusters;
+    private float percentageToKeep;
 
-    public ClusterTool(Flag[] listOfFlags, int numberOfClusters) {
+    public ClusterTool(Flag[] listOfFlags, int numberOfClusters, float percentageToKeep) {
         this.listOfFlags = listOfFlags;
         this.numberOfClusters = numberOfClusters;
+        this.percentageToKeep = percentageToKeep;
     }
 
     // main method to pilot all the biclustering process
@@ -61,11 +60,8 @@ public class ClusterTool
 
         int position = (indexes.length/2)-1; // position of medianIndex in indexes array
         int medianIndex = indexes[position]; // value of the index of the median
-        float percentageToKeep = 60; // percentage to keep, centered on the median (half above and under)
-        //Percentage : Max clusters / 40%:8 / 50%:10 / 60%:20 / 70%:22 / 80%:32
-        // 60% and 15 clusters is nice, more tests to do
-        int bottomIndex = (int)((position)-((percentageToKeep/200.0)*indexes.length));
-        int topIndex = (int)((position)+((percentageToKeep/200.0)*indexes.length));
+        int bottomIndex = (int)((position)-((this.percentageToKeep/200.0)*indexes.length));
+        int topIndex = (int)((position)+((this.percentageToKeep/200.0)*indexes.length));
         Integer[] indexesOfFlagsToKeep = Arrays.copyOfRange(indexes, bottomIndex,topIndex+1);
 
         millisEnd = Calendar.getInstance().getTimeInMillis();
@@ -304,8 +300,8 @@ public class ClusterTool
                 ArrayList<Integer> horizontalFlags = new ArrayList<Integer>();
                 ArrayList<int[]> thepairs = new ArrayList<int[]>();
                 int cancelToken = 0;
-                if(horizontal<2&&vertical<2){}
-                else if(horizontal!=vertical)
+                if(vertical+1>=horizontal && vertical+1<=horizontal+horizontalMoving){}
+                else
                 {
                     for (int i = 0; i < horizontalMoving; i++)
                     {
@@ -364,14 +360,21 @@ public class ClusterTool
                     {
                         horizontalFlags.addAll(verticalFlags);
                         ArrayList<Integer> flags = new ArrayList<Integer>(horizontalFlags);
+                        pairs = (ArrayList<int[]>) thepairs.clone();
                         possibilities.add(flags);
                         break;
-
                     }
                 }
             }
             vertical++;
         }
+        System.out.print("Selected pairs : ");
+        for(int[] pair : pairs)
+        {
+            System.out.print(Arrays.toString(pair));
+        }
+        System.out.println();
+
         int[] clustersDistances = new int[possibilities.size()];
         for(int i=0; i<possibilities.size();i++)
         {
