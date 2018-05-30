@@ -185,13 +185,13 @@ public class BiClusterTool
         footPrint[0] = stringCompare(flagOne.name,flagTwo.name);
         footPrint[1] = nonSubtractionCompare(flagOne.landmass,flagTwo.landmass);
         footPrint[2] = nonSubtractionCompare(flagOne.zone,flagTwo.zone);
-        footPrint[3] = subtractionCompare(flagOne.area, flagTwo.area);
-        footPrint[4] = subtractionCompare(flagOne.population, flagTwo.population);
+        footPrint[3] = nonSubtractionCompare(flagOne.area, flagTwo.area);
+        footPrint[4] = nonSubtractionCompare(flagOne.population, flagTwo.population);
         footPrint[5] = nonSubtractionCompare(flagOne.language,flagTwo.language);
         footPrint[6] = nonSubtractionCompare(flagOne.religion,flagTwo.religion);
-        footPrint[7] = subtractionCompare(flagOne.bars,flagTwo.bars);
-        footPrint[8] = subtractionCompare(flagOne.stripes, flagTwo.stripes);
-        footPrint[9] = subtractionCompare(flagOne.colours, flagTwo.colours);
+        footPrint[7] = nonSubtractionCompare(flagOne.bars,flagTwo.bars);
+        footPrint[8] = nonSubtractionCompare(flagOne.stripes, flagTwo.stripes);
+        footPrint[9] = nonSubtractionCompare(flagOne.colours, flagTwo.colours);
         footPrint[10] = nonSubtractionCompare(flagOne.red, flagTwo.red);
         footPrint[11] = nonSubtractionCompare(flagOne.green, flagTwo.green);
         footPrint[12] = nonSubtractionCompare(flagOne.blue, flagTwo.blue);
@@ -200,11 +200,11 @@ public class BiClusterTool
         footPrint[15] = nonSubtractionCompare(flagOne.black, flagTwo.black);
         footPrint[16] = nonSubtractionCompare(flagOne.orange, flagTwo.orange);
         footPrint[17] = stringCompare(flagOne.mainhue,flagTwo.mainhue);
-        footPrint[18] = subtractionCompare(flagOne.circles, flagTwo.circles);
-        footPrint[19] = subtractionCompare(flagOne.crosses, flagTwo.crosses);
-        footPrint[20] = subtractionCompare(flagOne.saltires, flagTwo.saltires);
-        footPrint[21] = subtractionCompare(flagOne.quarters, flagTwo.quarters);
-        footPrint[22] = subtractionCompare(flagOne.sunstars, flagTwo.sunstars);
+        footPrint[18] = nonSubtractionCompare(flagOne.circles, flagTwo.circles);
+        footPrint[19] = nonSubtractionCompare(flagOne.crosses, flagTwo.crosses);
+        footPrint[20] = nonSubtractionCompare(flagOne.saltires, flagTwo.saltires);
+        footPrint[21] = nonSubtractionCompare(flagOne.quarters, flagTwo.quarters);
+        footPrint[22] = nonSubtractionCompare(flagOne.sunstars, flagTwo.sunstars);
         footPrint[23] = nonSubtractionCompare(flagOne.crescent, flagTwo.crescent);
         footPrint[24] = nonSubtractionCompare(flagOne.triangle, flagTwo.triangle);
         footPrint[25] = nonSubtractionCompare(flagOne.icon, flagTwo.icon);
@@ -223,11 +223,6 @@ public class BiClusterTool
 
     //method to compare 2 ints, when subtraction doesn't represent closeness. Same output as above
     private int nonSubtractionCompare(int a, int b){
-        return a == b ? 1 : 0;
-    }
-
-    //method to compare 2 ints, when subtraction represents closeness.
-    private int subtractionCompare(int a, int b){
         return a == b ? 1 : 0;
     }
 
