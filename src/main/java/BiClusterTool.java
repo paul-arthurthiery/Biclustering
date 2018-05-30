@@ -77,6 +77,8 @@ public class BiClusterTool
         long millisEnd = Calendar.getInstance().getTimeInMillis();
         System.out.println("Distance Done Time : "+(millisEnd-millisStart));
 
+
+
         millisStart = Calendar.getInstance().getTimeInMillis();
 
         ArrayIndexComparator comparator = new ArrayIndexComparator(arrayAllPairDistances);
@@ -210,29 +212,23 @@ public class BiClusterTool
         footPrint[27] = nonSubtractionCompare(flagOne.text, flagTwo.text);
         footPrint[28] = stringCompare(flagOne.topleft,flagTwo.topleft);
         footPrint[29] = stringCompare(flagOne.botright,flagTwo.botright);
-        for(int i=0; i<footPrint.length;i++)
-        {
-            footPrint[i] = footPrint[i] == 0 ? 0 : 1;
-        }
         return footPrint;
     }
 
     // method to compare two String, return 0 if identical, 1 otherwise
     private int stringCompare(String a, String b)
     {
-        return a.matches(b) ? 0 : 100;
+        return a.matches(b) ? 1 : 0;
     }
 
     //method to compare 2 ints, when subtraction doesn't represent closeness. Same output as above
     private int nonSubtractionCompare(int a, int b){
-        return a == b ? 0: 100;
+        return a == b ? 1 : 0;
     }
 
     //method to compare 2 ints, when subtraction represents closeness.
     private int subtractionCompare(int a, int b){
-        if(a == b) return 0;
-        int max = a>b ? a : b;
-        return (abs(a-b)/max)*100;
+        return a == b ? 1 : 0;
     }
 
     /* custom comparator to sort an array of indexes (generated from an initial array)
