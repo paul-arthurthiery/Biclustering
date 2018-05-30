@@ -5,13 +5,14 @@ import java.util.List;
 
 import static java.lang.Math.abs;
 
-public class ClusterTool
+
+public class BiClusterTool
 {
     private Flag[] listOfFlags;
     private int numberOfClusters;
     private float percentageToKeep;
 
-    public ClusterTool(Flag[] listOfFlags, int numberOfClusters, float percentageToKeep) {
+    public BiClusterTool(Flag[] listOfFlags, int numberOfClusters, float percentageToKeep) {
         this.listOfFlags = listOfFlags;
         this.numberOfClusters = numberOfClusters;
         this.percentageToKeep = percentageToKeep;
@@ -23,30 +24,32 @@ public class ClusterTool
         Flag[] singleClusteredList = this.listOfFlags.clone();
 
         long millisStart = Calendar.getInstance().getTimeInMillis();
-        // loops through all the clusters and all the flags intra-cluster to compare flags one by one,
-        // and store an array with the distances between each
+
 
         int numberOfFlags = this.listOfFlags.length;
-        int[] arrayAllPairDistances = new int[(numberOfFlags*(numberOfFlags-1))/2]; //one dimension array with all the distances of the possible pairs of flags
-        int[][] flagPairs = new int[arrayAllPairDistances.length][2]; //all the possible pairs of flags
-        int[][] distances = new int[singleClusteredList.length][singleClusteredList.length];//all pairs distances in 2D
-        int[] averageDistancePerFlag = new int[listOfFlags.length];
+        int[][] flagPairs = new int[(numberOfFlags*(numberOfFlags-1))/2][2]; //all the possible pairs of flags
+
+        int[][] pairsFootPrints = new int[flagPairs.length][singleClusteredList[0].getClass().getDeclaredFields().length];
         int counter = 0;
         for(int i=0; i<singleClusteredList.length;i++)
         {
             Flag flagOne = singleClusteredList[i];
-            distances[i][i] = 0;
             for(int j=i+1; j<singleClusteredList.length;j++)
             {
                 Flag flagTwo = singleClusteredList[j];
-                distances[i][j] = distances[j][i] = arrayAllPairDistances[counter] = compareTwoFlags(flagOne, flagTwo);
-                averageDistancePerFlag[i] += distances[i][j];
-                averageDistancePerFlag[j] += distances[i][j];
+                pairsFootPrints[counter] = comparePairFlags(flagOne,flagTwo);
                 flagPairs[counter][0] = i;
                 flagPairs[counter][1] = j;
                 counter++;
             }
-            averageDistancePerFlag[i] /= listOfFlags.length;
+        }
+
+        ArrayList<int[]> patterns = new ArrayList<int[]>();
+        ArrayList<ArrayList<Flag>> clusters = new ArrayList<ArrayList<Flag>>();
+
+        for(int[] footPrint : pairsFootPrints)
+        {
+
         }
 
         long millisEnd = Calendar.getInstance().getTimeInMillis();
@@ -152,43 +155,6 @@ public class ClusterTool
         mainframe.setVisible(true);
     }
 
-    // method to compare attributes of two flags, returns the difference in an array
-    private int compareTwoFlags(Flag flagOne, Flag flagTwo)
-    {
-        int distance = 0;
-        distance += stringCompare(flagOne.name,flagTwo.name);
-        distance += nonSubtractionCompare(flagOne.landmass,flagTwo.landmass);
-        distance += nonSubtractionCompare(flagOne.zone,flagTwo.zone);
-        distance += subtractionCompare(flagOne.area, flagTwo.area);
-        distance += subtractionCompare(flagOne.population, flagTwo.population);
-        distance += nonSubtractionCompare(flagOne.language,flagTwo.language);
-        distance += nonSubtractionCompare(flagOne.religion,flagTwo.religion);
-        distance += subtractionCompare(flagOne.bars,flagTwo.bars);
-        distance += subtractionCompare(flagOne.stripes, flagTwo.stripes);
-        distance += subtractionCompare(flagOne.colours, flagTwo.colours);
-        distance += nonSubtractionCompare(flagOne.red, flagTwo.red);
-        distance += nonSubtractionCompare(flagOne.green, flagTwo.green);
-        distance += nonSubtractionCompare(flagOne.blue, flagTwo.blue);
-        distance += nonSubtractionCompare(flagOne.gold, flagTwo.gold);
-        distance += nonSubtractionCompare(flagOne.white, flagTwo.white);
-        distance += nonSubtractionCompare(flagOne.black, flagTwo.black);
-        distance += nonSubtractionCompare(flagOne.orange, flagTwo.orange);
-        distance += stringCompare(flagOne.mainhue,flagTwo.mainhue);
-        distance += subtractionCompare(flagOne.circles, flagTwo.circles);
-        distance += subtractionCompare(flagOne.crosses, flagTwo.crosses);
-        distance += subtractionCompare(flagOne.saltires, flagTwo.saltires);
-        distance += subtractionCompare(flagOne.quarters, flagTwo.quarters);
-        distance += subtractionCompare(flagOne.sunstars, flagTwo.sunstars);
-        distance += nonSubtractionCompare(flagOne.crescent, flagTwo.crescent);
-        distance += nonSubtractionCompare(flagOne.triangle, flagTwo.triangle);
-        distance += nonSubtractionCompare(flagOne.icon, flagTwo.icon);
-        distance += nonSubtractionCompare(flagOne.animate, flagTwo.animate);
-        distance += nonSubtractionCompare(flagOne.text, flagTwo.text);
-        distance += stringCompare(flagOne.topleft,flagTwo.topleft);
-        distance += stringCompare(flagOne.botright,flagTwo.botright);
-        return distance;
-    }
-
     private int[] comparePairFlags(Flag flagOne, Flag flagTwo)
     {
         int[] footPrint = new int[flagOne.getClass().getDeclaredFields().length];
@@ -249,7 +215,29 @@ public class ClusterTool
 
     /* custom comparator to sort an array of indexes (generated from an initial array)
      instead of sorting the initial array */
+    public class ArrayIndexComparator implements Comparator<Integer> {
+        private final int[] array;
 
+        public ArrayIndexComparator(int[] array)
+        {
+            this.array = array;
+        }
+
+        public Integer[] createIndexArray()
+        {
+            Integer[] indexes = new Integer[array.length];
+            for (int i = 0; i < array.length; i++)
+            {
+                indexes[i] = i;
+            }
+            return indexes;
+        }
+
+        public int compare(Integer index1, Integer index2)
+        {
+            return array[index1] <= array[index2] ? (array[index1] < array[index2] ? -1 : 0) : 1;
+        }
+    }
 
     // dispatches the remaining flags into the clusters they are closest to
     public List<List<Flag>> biClusterFromFirstElements(List<List<Flag>> biclusters, int[][] distances, Stack<Flag> remainingFlagsStack){
