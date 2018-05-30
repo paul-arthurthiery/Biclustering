@@ -17,7 +17,7 @@ public class Testing
         Flag[] flags = processor.processFile("flag.txt");
 
         ClusterTool clusterer = new ClusterTool(flags, numberOfClusters, percentageToKeep);
-        List<List<Flag>> result = clusterer.biCluster();
+        List<List<Flag>> result = clusterer.cluster();
         clusterer.displayClustersFlags(result);
 
     }

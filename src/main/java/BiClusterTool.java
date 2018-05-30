@@ -19,111 +19,66 @@ public class BiClusterTool
     }
 
     // main method to pilot all the biclustering process
-    public List<List<Flag>> biCluster()
+    public List<List<Flag>> biCluster(List<List<Flag>> clusteredFlags)
     {
-        Flag[] singleClusteredList = this.listOfFlags.clone();
 
         long millisStart = Calendar.getInstance().getTimeInMillis();
 
-        int numberOfFlags = this.listOfFlags.length;
-        int[][] flagPairs = new int[(numberOfFlags*(numberOfFlags-1))/2][2]; //all the possible pairs of flags
-
-        // first step is to create all the clusters
-
-        int[][] pairsFootPrints = new int[flagPairs.length][singleClusteredList[0].getClass().getDeclaredFields().length];
-        int counter = 0;
-        for(int i=0; i<singleClusteredList.length;i++)
-        {
-            Flag flagOne = singleClusteredList[i];
-            for(int j=i+1; j<singleClusteredList.length;j++)
-            {
-                Flag flagTwo = singleClusteredList[j];
-                pairsFootPrints[counter] = comparePairFlags(flagOne,flagTwo);
-                flagPairs[counter][0] = i;
-                flagPairs[counter][1] = j;
-                counter++;
-            }
-        }
-
-        ArrayList<int[]> patterns = new ArrayList<int[]>();
-        ArrayList<ArrayList<Flag>> clusters = new ArrayList<ArrayList<Flag>>();
-
-        for(int[] footPrint : pairsFootPrints)
-        {
-            if(!patterns.contains(footPrint))
-            {
-                patterns.add(footPrint);
-                ArrayList<Flag> flags = new ArrayList<Flag>();
-                Flag flagOne = this.listOfFlags[flagPairs[counter][0]];
-                Flag flagTwo = this.listOfFlags[flagPairs[counter][1]];
-                flags.add(flagOne);
-                flags.add(flagTwo);
-                clusters.add(flags);
-            }
-            else
-            {
-                int patternIndex = patterns.indexOf(footPrint);
-                Flag flagOne = this.listOfFlags[flagPairs[counter][0]];
-                Flag flagTwo = this.listOfFlags[flagPairs[counter][1]];
-                if(!clusters.get(patternIndex).contains(flagOne)) {
-                    clusters.get(patternIndex).add(flagOne);
-                }
-                if(!clusters.get(patternIndex).contains(flagTwo)) {
-                    clusters.get(patternIndex).add(flagTwo);
+        // analyze pairs in all the clusters, create and add sets where 2 flags have at least 3 criteria in common
+        List<List<Flag>> sets = new ArrayList<List<Flag>>();
+        for(int a=0; a<clusteredFlags.size(); a++) {
+            for(int i=0; i<clusteredFlags.get(a).size();i++) {
+                Flag flagOne = clusteredFlags.get(a).get(i);
+                for (int j = i + 1; j < clusteredFlags.size(); j++) {
+                    Flag flagTwo = clusteredFlags.get(a).get(j);
+                    ArrayList<Integer> footPrint = comparePairFlags(flagOne, flagTwo);
+                    if(footPrint.size()>3) {
+                        List<Flag> newSet = new ArrayList<Flag>();
+                        newSet.add(flagOne);
+                        newSet.add(flagTwo);
+                        sets.add(newSet);
+                    }
                 }
             }
         }
-
-
-        long millisEnd = Calendar.getInstance().getTimeInMillis();
-        System.out.println("Distance Done Time : "+(millisEnd-millisStart));
-
-
-
-        List<List<Flag>> biClusteredFlags = new ArrayList<List<Flag>>();
-        Stack remainingFlagsStack = new Stack<Flag>();
-        remainingFlagsStack.addAll(Arrays.asList(listOfFlags));
-
-
         
-        return biClusteredFlags;
+        return sets;
     }
 
 
-
-    private int[] comparePairFlags(Flag flagOne, Flag flagTwo)
+    private ArrayList<Integer> comparePairFlags(Flag flagOne, Flag flagTwo)
     {
-        int[] footPrint = new int[flagOne.getClass().getDeclaredFields().length];
-        footPrint[0] = stringCompare(flagOne.name,flagTwo.name);
-        footPrint[1] = nonSubtractionCompare(flagOne.landmass,flagTwo.landmass);
-        footPrint[2] = nonSubtractionCompare(flagOne.zone,flagTwo.zone);
-        footPrint[3] = nonSubtractionCompare(flagOne.area, flagTwo.area);
-        footPrint[4] = nonSubtractionCompare(flagOne.population, flagTwo.population);
-        footPrint[5] = nonSubtractionCompare(flagOne.language,flagTwo.language);
-        footPrint[6] = nonSubtractionCompare(flagOne.religion,flagTwo.religion);
-        footPrint[7] = nonSubtractionCompare(flagOne.bars,flagTwo.bars);
-        footPrint[8] = nonSubtractionCompare(flagOne.stripes, flagTwo.stripes);
-        footPrint[9] = nonSubtractionCompare(flagOne.colours, flagTwo.colours);
-        footPrint[10] = nonSubtractionCompare(flagOne.red, flagTwo.red);
-        footPrint[11] = nonSubtractionCompare(flagOne.green, flagTwo.green);
-        footPrint[12] = nonSubtractionCompare(flagOne.blue, flagTwo.blue);
-        footPrint[13] = nonSubtractionCompare(flagOne.gold, flagTwo.gold);
-        footPrint[14] = nonSubtractionCompare(flagOne.white, flagTwo.white);
-        footPrint[15] = nonSubtractionCompare(flagOne.black, flagTwo.black);
-        footPrint[16] = nonSubtractionCompare(flagOne.orange, flagTwo.orange);
-        footPrint[17] = stringCompare(flagOne.mainhue,flagTwo.mainhue);
-        footPrint[18] = nonSubtractionCompare(flagOne.circles, flagTwo.circles);
-        footPrint[19] = nonSubtractionCompare(flagOne.crosses, flagTwo.crosses);
-        footPrint[20] = nonSubtractionCompare(flagOne.saltires, flagTwo.saltires);
-        footPrint[21] = nonSubtractionCompare(flagOne.quarters, flagTwo.quarters);
-        footPrint[22] = nonSubtractionCompare(flagOne.sunstars, flagTwo.sunstars);
-        footPrint[23] = nonSubtractionCompare(flagOne.crescent, flagTwo.crescent);
-        footPrint[24] = nonSubtractionCompare(flagOne.triangle, flagTwo.triangle);
-        footPrint[25] = nonSubtractionCompare(flagOne.icon, flagTwo.icon);
-        footPrint[26] = nonSubtractionCompare(flagOne.animate, flagTwo.animate);
-        footPrint[27] = nonSubtractionCompare(flagOne.text, flagTwo.text);
-        footPrint[28] = stringCompare(flagOne.topleft,flagTwo.topleft);
-        footPrint[29] = stringCompare(flagOne.botright,flagTwo.botright);
+        ArrayList<Integer> footPrint = new ArrayList<Integer>();
+        if(stringCompare(flagOne.name,flagTwo.name)>0) footPrint.add(1);
+        if(nonSubtractionCompare(flagOne.landmass,flagTwo.landmass) >0) footPrint.add(2);
+        if(nonSubtractionCompare(flagOne.zone,flagTwo.zone)>0) footPrint.add(3);
+        if(nonSubtractionCompare(flagOne.area, flagTwo.area)>0) footPrint.add(4);
+        if(nonSubtractionCompare(flagOne.population, flagTwo.population)>0) footPrint.add(5);
+        if(nonSubtractionCompare(flagOne.language,flagTwo.language)>0) footPrint.add(6);
+        if(nonSubtractionCompare(flagOne.religion,flagTwo.religion)>0) footPrint.add(7);
+        if(nonSubtractionCompare(flagOne.bars,flagTwo.bars)>0) footPrint.add(8);
+        if(nonSubtractionCompare(flagOne.stripes, flagTwo.stripes)>0) footPrint.add(9);
+        if(nonSubtractionCompare(flagOne.colours, flagTwo.colours)>0) footPrint.add(10);
+        if(nonSubtractionCompare(flagOne.red, flagTwo.red)>0) footPrint.add(11);
+        if(nonSubtractionCompare(flagOne.green, flagTwo.green)>0) footPrint.add(12);
+        if(nonSubtractionCompare(flagOne.blue, flagTwo.blue)>0) footPrint.add(13);
+        if(nonSubtractionCompare(flagOne.gold, flagTwo.gold)>0) footPrint.add(14);
+        if(nonSubtractionCompare(flagOne.white, flagTwo.white)>0) footPrint.add(15);
+        if(nonSubtractionCompare(flagOne.black, flagTwo.black)>0) footPrint.add(16);
+        if(nonSubtractionCompare(flagOne.orange, flagTwo.orange)>0) footPrint.add(17);
+        if(stringCompare(flagOne.mainhue,flagTwo.mainhue)>0) footPrint.add(18);
+        if(nonSubtractionCompare(flagOne.circles, flagTwo.circles)>0) footPrint.add(19);
+        if(nonSubtractionCompare(flagOne.crosses, flagTwo.crosses)>0) footPrint.add(20);
+        if(nonSubtractionCompare(flagOne.saltires, flagTwo.saltires)>0) footPrint.add(21);
+        if(nonSubtractionCompare(flagOne.quarters, flagTwo.quarters)>0) footPrint.add(22);
+        if(nonSubtractionCompare(flagOne.sunstars, flagTwo.sunstars)>0) footPrint.add(23);
+        if(nonSubtractionCompare(flagOne.crescent, flagTwo.crescent)>0) footPrint.add(24);
+        if(nonSubtractionCompare(flagOne.triangle, flagTwo.triangle)>0) footPrint.add(25);
+        if(nonSubtractionCompare(flagOne.icon, flagTwo.icon)>0) footPrint.add(26);
+        if(nonSubtractionCompare(flagOne.animate, flagTwo.animate)>0) footPrint.add(27);
+        if(nonSubtractionCompare(flagOne.text, flagTwo.text)>0) footPrint.add(28);
+        if(stringCompare(flagOne.topleft,flagTwo.topleft)>0) footPrint.add(29);
+        if(stringCompare(flagOne.botright,flagTwo.botright)>0) footPrint.add(30);
         return footPrint;
     }
 
