@@ -49,8 +49,16 @@ public class BiClusterTool
             int counter = 0;
             for (List<Flag> set: sets) {
                 ArrayList<Integer> footPrint = comparePairFlags(flag, set.get(0));
-                if(footPrint == footPrints.get(counter)) set.add(flag);
+                if(footPrint.equals(footPrints.get(counter))) set.add(flag);
                 counter++;
+            }
+        }
+        for(int k =0; k<sets.size(); k++){
+            for(int m=k+1; m<sets.size();m++){
+                if(footPrints.get(k).equals(footPrints.get(m))){
+                    sets.get(k).addAll(sets.get(m));
+                    sets.remove(sets.get(m));
+                }
             }
         }
         /*
