@@ -18,8 +18,7 @@ public class ClusterTool
     }
 
     // main method to pilot all the clustering process
-    public List<List<Flag>> cluster()
-    {
+    public List<List<Flag>> cluster() {
         Flag[] singleClusteredList = this.listOfFlags.clone();
 
         long millisStart = Calendar.getInstance().getTimeInMillis();
@@ -111,8 +110,7 @@ public class ClusterTool
     }
 
     // method to display the flags of the result of the bicluster
-    public void displayClustersFlags(List<List<Flag>> clusters)
-    {
+    public void displayClustersFlags(List<List<Flag>> clusters) {
         int counter = 1;
         for(List<Flag> cluster : clusters)
         {
@@ -136,15 +134,13 @@ public class ClusterTool
         }
     }
     // resizes an ImageIcon
-    private ImageIcon resizeIcon(ImageIcon icon, int width, int height)
-    {
+    private ImageIcon resizeIcon(ImageIcon icon, int width, int height) {
         Image img = icon.getImage();
         Image newimg = img.getScaledInstance(width, height,  java.awt.Image.SCALE_SMOOTH);
         return new ImageIcon(newimg);
     }
     // shows the frame with the flags
-    private void showFrame(JPanel pane, String title)
-    {
+    private void showFrame(JPanel pane, String title) {
         JFrame mainframe = new JFrame(title);
         mainframe.getContentPane().add(pane);
         mainframe.setBounds(0, 0, 1000, 1000);
@@ -153,8 +149,7 @@ public class ClusterTool
     }
 
     // method to compare attributes of two flags, returns the difference in an array
-    private int compareTwoFlags(Flag flagOne, Flag flagTwo)
-    {
+    private int compareTwoFlags(Flag flagOne, Flag flagTwo) {
         int distance = 0;
         distance += stringCompare(flagOne.name,flagTwo.name);
         distance += nonSubtractionCompare(flagOne.landmass,flagTwo.landmass);
@@ -189,8 +184,7 @@ public class ClusterTool
         return distance;
     }
 
-    private int[] comparePairFlags(Flag flagOne, Flag flagTwo)
-    {
+    private int[] comparePairFlags(Flag flagOne, Flag flagTwo) {
         int[] footPrint = new int[flagOne.getClass().getDeclaredFields().length];
         footPrint[0] = stringCompare(flagOne.name,flagTwo.name);
         footPrint[1] = nonSubtractionCompare(flagOne.landmass,flagTwo.landmass);
@@ -276,9 +270,7 @@ public class ClusterTool
         int num = 0;
         for(int i=0; i<biClusteredFlags.size();i++){
             num+=biClusteredFlags.get(i).size();
-            System.out.println(biClusteredFlags.get(i));
         }
-        System.out.println("Number of Countries : "+num);
     }
 
     // method to call to generate the clusters with a first flag inside
@@ -390,12 +382,10 @@ public class ClusterTool
             }
             vertical++;
         }
-        System.out.print("Selected pairs : ");
         for(int[] pair : pairs)
         {
             System.out.print(Arrays.toString(pair));
         }
-        System.out.println();
 
         int[] clustersDistances = new int[possibilities.size()];
         for(int i=0; i<possibilities.size();i++)
@@ -417,7 +407,6 @@ public class ClusterTool
         Integer[] indexes = comparator.createIndexArray();
         Arrays.sort(indexes, comparator);
         int bestCluster = indexes[indexes.length-1];
-        System.out.println("Found Possibilities : "+possibilities.size()+" , Selected One : "+bestCluster);
         for(int flagNum : possibilities.get(bestCluster))
         {
             Flag flag = this.listOfFlags[flagNum];
@@ -449,7 +438,6 @@ public class ClusterTool
         biClusteredFlags.add(clusterTwo);
         toReturn[0] = biClusteredFlags;
         toReturn[1] = remainingFlagsStack;
-        System.out.println(Arrays.toString(bestPair));
         return toReturn;
     }
 

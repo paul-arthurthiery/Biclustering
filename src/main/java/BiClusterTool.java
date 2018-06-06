@@ -19,8 +19,7 @@ public class BiClusterTool
     }
 
     // main method to pilot all the biclustering process
-    public List<List<Flag>> biCluster(List<List<Flag>> clusteredFlags)
-    {
+    public List<List<Flag>> biCluster(List<List<Flag>> clusteredFlags) {
 
         long millisStart = Calendar.getInstance().getTimeInMillis();
 
@@ -33,17 +32,25 @@ public class BiClusterTool
                 for (int j = i + 1; j < clusteredFlags.size(); j++) {
                     Flag flagTwo = clusteredFlags.get(a).get(j);
                     ArrayList<Integer> footPrint = comparePairFlags(flagOne, flagTwo);
-                    if(footPrint.size() >=3 && checkIfFootPrintGenerated(footPrint, footPrints)==0) {
+                    if(footPrint.size() >=20 && checkIfFootPrintGenerated(footPrint, footPrints)<0) {
                         footPrints.add(footPrint);
                         List<Flag> newSet = new ArrayList<Flag>();
                         newSet.add(flagOne);
                         newSet.add(flagTwo);
                         sets.add(newSet);
-                    } else if(footPrint.size() >= 3 && checkIfFootPrintGenerated(footPrint, footPrints)>0){
+                    } else if(footPrint.size() >= 20 && checkIfFootPrintGenerated(footPrint, footPrints)>=0){
                         sets.get(checkIfFootPrintGenerated(footPrint, footPrints)).add(flagOne);
-                        sets.get(checkIfFootPrintGenerated(footPrint, footPrints)).add(flagTwo)
+                        sets.get(checkIfFootPrintGenerated(footPrint, footPrints)).add(flagTwo);
                     }
                 }
+            }
+        }
+        for(Flag flag: listOfFlags){
+            int counter = 0;
+            for (List<Flag> set: sets) {
+                ArrayList<Integer> footPrint = comparePairFlags(flag, set.get(0));
+                if(footPrint == footPrints.get(counter)) set.add(flag);
+                counter++;
             }
         }
         /*
@@ -118,12 +125,13 @@ public class BiClusterTool
         return sets;
     }
 
-    private boolean checkIfFootPrintGenerated(ArrayList<Integer> footPrint, List<List<Integer>> footPrints) {
+    private int checkIfFootPrintGenerated(ArrayList<Integer> footPrint, List<List<Integer>> footPrints) {
+        if(footPrints.contains(footPrint)) return footPrints.indexOf(footPrint);
+        else return -1;
     }
 
 
-    private ArrayList<Integer> comparePairFlags(Flag flagOne, Flag flagTwo)
-    {
+    private ArrayList<Integer> comparePairFlags(Flag flagOne, Flag flagTwo) {
         ArrayList<Integer> footPrint = new ArrayList<Integer>();
         if(stringCompare(flagOne.name,flagTwo.name)>0) footPrint.add(1);
         if(nonSubtractionCompare(flagOne.landmass,flagTwo.landmass) >0) footPrint.add(2);
@@ -158,8 +166,7 @@ public class BiClusterTool
         return footPrint;
     }
 
-    private int[] compareTwoFlags(Flag flagOne, Flag flagTwo)
-    {
+    private int[] compareTwoFlags(Flag flagOne, Flag flagTwo) {
         int numberOfMatch = 0;
         int[] footPrint = new int[flagOne.getClass().getDeclaredFields().length];
         numberOfMatch += footPrint[0] = stringCompare(flagOne.name, flagTwo.name);
@@ -232,8 +239,8 @@ public class BiClusterTool
     //##########################
 
     // method to display the flags of the result of the bicluster
-    public void displayClustersFlags(List<List<Flag>> clusters)
-    {
+    public void displayClustersFlags(List<List<Flag>> clusters) {
+        printBicluster(clusters);
         int counter = 1;
         for(List<Flag> cluster : clusters)
         {
@@ -257,15 +264,13 @@ public class BiClusterTool
         }
     }
     // resizes an ImageIcon
-    private ImageIcon resizeIcon(ImageIcon icon, int width, int height)
-    {
+    private ImageIcon resizeIcon(ImageIcon icon, int width, int height) {
         Image img = icon.getImage();
         Image newimg = img.getScaledInstance(width, height,  java.awt.Image.SCALE_SMOOTH);
         return new ImageIcon(newimg);
     }
     // shows the frame with the flags
-    private void showFrame(JPanel pane, String title)
-    {
+    private void showFrame(JPanel pane, String title) {
         JFrame mainframe = new JFrame(title);
         mainframe.getContentPane().add(pane);
         mainframe.setBounds(0, 0, 1000, 1000);

@@ -18,7 +18,9 @@ public class Testing
 
         ClusterTool clusterer = new ClusterTool(flags, numberOfClusters, percentageToKeep);
         List<List<Flag>> result = clusterer.cluster();
-        clusterer.displayClustersFlags(result);
+        BiClusterTool biclusterer = new BiClusterTool(flags, numberOfClusters, percentageToKeep);
+        List<List<Flag>> result2 = biclusterer.biCluster(result);
+        biclusterer.displayClustersFlags(result2);
 
     }
 
